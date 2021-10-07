@@ -1,0 +1,37 @@
+﻿<ContentControl x:Class="TelegramBotCrypto.Views.Pages.MessagesView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TelegramBotCrypto.Views.Pages"
+      xmlns:xtsn="clr-namespace:TelegramBotCrypto.Services.Extension"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      mc:Ignorable="d" 
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:vm="clr-namespace:TelegramBotCrypto.ViewModels.Pages">
+    <ContentControl.DataContext>
+        <vm:MessageViewModel/>
+    </ContentControl.DataContext>
+    
+    <StackPanel Orientation="Vertical" Background="WhiteSmoke">
+        <TextBox x:Name="message" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10"
+                 Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 materialDesign:HintAssist.Hint="Сообщение"/>
+        <ComboBox Width="200" Margin="5"
+                  Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                  materialDesign:HintAssist.Hint="Адресат"
+                  SelectedIndex="{Binding SelectedRecipient}"
+                  ItemsSource="{Binding RecipientsType}"/>
+        <!--<ComboBox Width="200" Margin="5"
+                  Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                  materialDesign:HintAssist.Hint="Тип валюты"
+                  SelectedItem="{Binding SelectedCryptoType}"
+                  DisplayMemberPath="Title"
+                  ItemsSource="{Binding CryptoTypes}"/>-->        
+        <Button Width="200"
+            Content="Отправить" IsEnabled="{Binding ElementName=message, Path=Text.Length}"
+                Command="{Binding SendMessagesCommand}"/>
+
+    </StackPanel>
+</ContentControl>
