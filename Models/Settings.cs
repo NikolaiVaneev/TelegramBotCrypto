@@ -12,7 +12,6 @@ namespace TelegramBotCrypto.Models
         private readonly string fileName = "Settings.xml";
         public string APIKey { get; set; } 
         public string HelloMessage { get; set; } 
-        public string PrizeMessage { get; set; } 
         public void Save()
         {
             XmlSerializer formatter = new XmlSerializer(typeof(Settings));

@@ -7,9 +7,9 @@ namespace TelegramBotCrypto.Services
 {
     public static class ExcelWorker
     {
-        public static List<Crypto> GetData(string filePath, string cryptoTypeId)
+        public static List<Wallet> GetData(string filePath, string cryptoTypeId)
         {
-            List<Crypto> cryptoList = new List<Crypto>();
+            List<Wallet> cryptoList = new List<Wallet>();
 
             using (FileStream stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
             {
@@ -23,11 +23,11 @@ namespace TelegramBotCrypto.Services
                     {
                         for (int i = 0; i < table.Rows.Count; i++)
                         {
-                            cryptoList.Add(new Crypto()
+                            cryptoList.Add(new Wallet()
                             {
                                 Code = table.Rows[i][0].ToString(),
-                                Link = table.Rows[i][1].ToString(),
-                                CryptoId = cryptoTypeId
+                            //    Link = table.Rows[i][1].ToString(),
+                               CryptoTypeId = cryptoTypeId
                             });
                         }
                     }

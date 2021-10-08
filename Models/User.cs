@@ -49,9 +49,5 @@ namespace TelegramBotCrypto.Models
             User_Status = user_Status;
         }
 
-        public void ChangeStatus()
-        {
-
-        }
     }
 }

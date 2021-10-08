@@ -25,8 +25,8 @@ namespace TelegramBotCrypto.ViewModels.Pages
         }
         #endregion
         #region Список криптовалют
-        private IEnumerable<Crypto> _cryptoList;
-        public IEnumerable<Crypto> CryptoList
+        private IEnumerable<Wallet> _cryptoList;
+        public IEnumerable<Wallet> CryptoList
         {
             get => _cryptoList;
             set => SetProperty(ref _cryptoList, value);
@@ -49,7 +49,11 @@ namespace TelegramBotCrypto.ViewModels.Pages
             {
                 SetProperty(ref _selectedCryptoType, value);
                 LoadCryptoList(_selectedCryptoType);
-                AddBtnEnabled = true;
+
+                if (value != null)
+                    AddBtnEnabled = true;
+                else
+                    AddBtnEnabled = false;
             }
         }
         #endregion
@@ -63,7 +67,7 @@ namespace TelegramBotCrypto.ViewModels.Pages
                 SetProperty(ref _searchBar, value);
                 if (SearchBar.Length > 0)
                 {
-                    CryptoList = CryptoList.Where(u => u.Link.ToLower().Contains(SearchBar.ToLower()) || 
+                    CryptoList = CryptoList.Where(u =>  
                                                        u.Code.ToLower().Contains(SearchBar.ToLower()) ||
                                                        u.UserId.ToString().Contains(SearchBar.ToLower()));
                 }
@@ -90,9 +94,10 @@ namespace TelegramBotCrypto.ViewModels.Pages
                 await Task.Run(() =>
                 {
                     CryptoType cryptoType = DataBase.GetCryptoTypeData(SelectedCryptoType);
-                    List<Crypto> list = ExcelWorker.GetData(ofd.FileName, cryptoType.Id.ToString());
+                    List<Wallet> list = ExcelWorker.GetData(ofd.FileName, cryptoType.Id.ToString());
                     DataBase.AddCryptoAddressCollection(list);
                     LoadCryptoTypeList();
+           
                 });
             }
 
@@ -112,10 +117,12 @@ namespace TelegramBotCrypto.ViewModels.Pages
         private void LoadCryptoTypeList()
         {
             CryptoTypes = DataBase.GetAllCryptoType();
+        
         }
         private void LoadCryptoList(string criptoTitle = "")
         {
             CryptoList = DataBase.GetAllCryptoAddress(criptoTitle);
+         
         }
     }
 }

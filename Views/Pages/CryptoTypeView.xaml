@@ -11,35 +11,8 @@
     <ContentControl.DataContext>
         <vm:CryptoTypeViewModel/>
     </ContentControl.DataContext>
-    <materialDesign:DialogHost Identifier="RootDialog">
-        <materialDesign:DialogHost.DialogContent >
-            <StackPanel Margin="16">
-                <TextBlock Text="Добавить криптовалюту"/>
-                <TextBox Margin="0 8 0 0" HorizontalAlignment="Stretch"
-                         Text="{Binding CryptoType, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         materialDesign:HintAssist.Hint = "Наименование"/>
-                <TextBox HorizontalAlignment="Stretch" TextWrapping="Wrap" 
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         materialDesign:HintAssist.Hint = "Сообщение" VerticalScrollBarVisibility="Auto"
-                         Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource MaterialDesignFlatButton}" Content="СОХРАНИТЬ"
-                        IsDefault="True" Margin="0 8 8 0"
-                        Command="{Binding AddCryptoTypeCommand}"/>
-                    <Button Style="{StaticResource MaterialDesignFlatButton}" IsCancel="True" Margin="0 8 8 0"
-                        Command="materialDesign:DialogHost.CloseDialogCommand">
-                        <Button.CommandParameter>
-                            <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
-                                False
-                            </system:Boolean>
-                        </Button.CommandParameter>
-                        ОТМЕНА
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </materialDesign:DialogHost.DialogContent>
-
+    <materialDesign:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding Dialog}">
+        
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -67,7 +40,7 @@
                 </materialDesign:ColorZone>
                 
                 <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}"
-                        Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                        Command="{Binding OpenDialogCommand}"
                         VerticalAlignment="Bottom" HorizontalAlignment="Right"
                         Grid.Row="0" Margin="0 0 28 -20">
                     <materialDesign:PackIcon Kind="Plus" Height="22" Width="22" />

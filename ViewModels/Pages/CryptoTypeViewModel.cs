@@ -1,10 +1,14 @@
 ﻿using MaterialDesignThemes.Wpf;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using TelegramBotCrypto.Data;
 using TelegramBotCrypto.Infrastructure.Commands;
 using TelegramBotCrypto.Models;
 using TelegramBotCrypto.Services;
+using TelegramBotCrypto.Views.Dialogs;
 
 namespace TelegramBotCrypto.ViewModels.Pages
 {
@@ -16,24 +20,8 @@ namespace TelegramBotCrypto.ViewModels.Pages
             get => _cryptoTypes;
             set => SetProperty(ref _cryptoTypes, value);
         }
-        #region Имя нового типа
-        private string _cryptoType;
-        /// <summary>Имя нового типа</summary>
-        public string CryptoType
-        {
-            get => _cryptoType;
-            set => SetProperty(ref _cryptoType, value);
-        }
-        #endregion
-        #region Приветственное сообщение
-        private string _message;
-        /// <summary>Сообщение</summary>
-        public string Message
-        {
-            get => _message;
-            set => SetProperty(ref _message, value);
-        }
-        #endregion
+
+
         #region Выбранный Item
         private CryptoType _selectedItem;
         /// <summary>Сообщение</summary>
@@ -43,33 +31,70 @@ namespace TelegramBotCrypto.ViewModels.Pages
             set => SetProperty(ref _selectedItem, value);
         }
         #endregion
+      
         #region Добавить криптовалюту
         public ICommand AddCryptoTypeCommand { get; }
         private bool CanAddCryptoTypeCommandExcecut(object p) => true;
         private void OnAddCryptoTypeCommandExecuted(object p)
         {
             DialogHost.CloseDialogCommand.Execute(null, null);
-            DataBase.AddCryptoType(CryptoType, Message);
             LoadCryptoTypeList();
-            CryptoType = string.Empty;
-            Message = string.Empty;
         }
         #endregion
 
-        #region Удалить криптовалюту
+        #region Изменить криптовалюту
         public ICommand OpenCryptoType { get; }
         private bool CanOpenCryptoTypeExcecut(object p) => true;
         private void OnOpenCryptoTypeExecuted(object p)
         {
-            DataBase.DeleteCryptoType(SelectedItem);
-            LoadCryptoTypeList();
+            OpenDialog(SelectedItem);
         }
         #endregion
+
+
+        #region Dialog
+
+        public ICommand OpenDialogCommand { get; }
+
+        private bool _isDialogOpen;
+        private object _dialog;
+
+        public bool IsDialogOpen
+        {
+            get => _isDialogOpen;
+            set
+            {
+                if (!value) LoadCryptoTypeList();
+                SetProperty(ref _isDialogOpen, value);
+            }
+
+        }
+        public object Dialog
+        {
+            get => _dialog;
+            set => SetProperty(ref _dialog, value);
+        }
+
+        private void OpenDialog(object obj)
+        {
+            if (obj == null)
+                Dialog = new CryptoTypeDialog(new CryptoType());
+            else
+                Dialog = new CryptoTypeDialog(obj as CryptoType);
+            IsDialogOpen = true;
+        }
+
+        #endregion
+
         public CryptoTypeViewModel()
         {
             LoadCryptoTypeList();
             AddCryptoTypeCommand = new RelayCommand(OnAddCryptoTypeCommandExecuted, CanAddCryptoTypeCommandExcecut);
             OpenCryptoType = new RelayCommand(OnOpenCryptoTypeExecuted, CanOpenCryptoTypeExcecut);
+
+            OpenDialogCommand = new RelayCommand(OpenDialog);
+
+
         }
         private void LoadCryptoTypeList()
         {

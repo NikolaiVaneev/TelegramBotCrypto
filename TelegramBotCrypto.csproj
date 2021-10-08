@@ -102,6 +102,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\Dialogs\CryptoTypeDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\ProgressBarDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Pages\CryptoView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -138,7 +146,9 @@
     <Compile Include="Infrastructure\Commands\Base\Command.cs" />
     <Compile Include="Infrastructure\Commands\CloseApplicationCommand.cs" />
     <Compile Include="Infrastructure\Commands\RelayCommand.cs" />
-    <Compile Include="Models\Crypto.cs" />
+    <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\Project.cs" />
+    <Compile Include="Models\Wallet.cs" />
     <Compile Include="Models\CryptoType.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\User.cs" />
@@ -157,6 +167,12 @@
     <Compile Include="ViewModels\Pages\SettingsViewModel.cs" />
     <Compile Include="ViewModels\Pages\UsersViewModel.cs" />
     <Compile Include="ViewModels\Windows\MainViewModel.cs" />
+    <Compile Include="Views\Dialogs\CryptoTypeDialog.xaml.cs">
+      <DependentUpon>CryptoTypeDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\ProgressBarDialog.xaml.cs">
+      <DependentUpon>ProgressBarDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Pages\CryptoView.xaml.cs">
       <DependentUpon>CryptoView.xaml</DependentUpon>
     </Compile>
@@ -211,7 +227,6 @@
     <Folder Include="ViewModels\Dialogs\" />
     <Folder Include="ViewModels\Items\" />
     <Folder Include="Views\Controls\" />
-    <Folder Include="Views\Dialogs\" />
     <Folder Include="Views\Items\" />
   </ItemGroup>
   <ItemGroup>

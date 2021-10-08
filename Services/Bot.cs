@@ -228,7 +228,7 @@ namespace TelegramBotCrypto.Services
             await Task.Run(() =>
             {
                 IEnumerable<User> users = DataBase.GetUserList();
-                IEnumerable<Crypto> cryptos = DataBase.GetAllCryptoAddress(cryptoType.Title);
+                IEnumerable<Wallet> cryptos = DataBase.GetAllCryptoAddress(cryptoType.Title);
 
                 if (cryptos.Count() == 0) return;
 
