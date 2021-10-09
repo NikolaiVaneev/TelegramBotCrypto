@@ -362,7 +362,10 @@ namespace TelegramBotCrypto.Data
                 if (string.IsNullOrEmpty(cryptoTitle))
                     list = connection.Query<Wallet>("SELECT * FROM Wallet");
                 else
-                    list = connection.Query<Wallet>($"SELECT CryptoTypeId, Code, UserId FROM Wallet w JOIN CryptoType ct ON ct.Id = w.CryptoTypeId WHERE ct.Title LIKE \"{cryptoTitle}\"");
+                {
+                    var ct = GetAllCryptoType().Where(u => u.Title == cryptoTitle).FirstOrDefault();
+                    list = connection.Query<Wallet>($"SELECT CryptoTypeId, Code, UserId FROM Wallet w JOIN CryptoType ct ON ct.Id = w.CryptoTypeId WHERE CryptoTypeId = {ct.Id}");
+                }
                 return list;
             };
         }

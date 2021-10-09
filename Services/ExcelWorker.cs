@@ -56,8 +56,6 @@ namespace TelegramBotCrypto.Services
 
             List<Participation> participations = DataBase.GetParticipationProject(project.Id);
 
-
-
             Workbook xlWorkBook;
             Worksheet xlWorkSheet;
             object misValue = System.Reflection.Missing.Value;

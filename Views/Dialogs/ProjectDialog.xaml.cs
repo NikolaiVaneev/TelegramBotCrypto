@@ -47,6 +47,7 @@ namespace TelegramBotCrypto.Views.Dialogs
             Project.Title = ProjectTitle.Text;
             Project.Message = ProjectMessage.Text;
             CryptoType cryptoType = (CryptoType)CryptoTypes.SelectedItem;
+            if (cryptoType != null)
             Project.CryptoTypeId = cryptoType.Id;
             DataBase.SaveProject(Project);
             DialogHost.CloseDialogCommand.Execute(null, null);

@@ -67,8 +67,7 @@ namespace TelegramBotCrypto.ViewModels.Pages
                 SetProperty(ref _searchBar, value);
                 if (SearchBar.Length > 0)
                 {
-                    CryptoList = CryptoList.Where(u =>  
-                                                       u.Code.ToLower().Contains(SearchBar.ToLower()) ||
+                    CryptoList = CryptoList.Where(u =>                                                       u.Code.ToLower().Contains(SearchBar.ToLower()) ||
                                                        u.UserId.ToString().Contains(SearchBar.ToLower()));
                 }
                 else
@@ -93,7 +92,7 @@ namespace TelegramBotCrypto.ViewModels.Pages
             {
                 await Task.Run(() =>
                 {
-                    CryptoType cryptoType = DataBase.GetCryptoTypeData(SelectedCryptoType);
+                    CryptoType cryptoType = DataBase.GetAllCryptoType().Where(u => u.Title == SelectedCryptoType).FirstOrDefault();
                     List<Wallet> list = ExcelWorker.GetData(ofd.FileName, cryptoType.Id);
                     DataBase.AddCryptoAddressCollection(list);
                     LoadCryptoTypeList();

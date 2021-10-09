@@ -15,7 +15,7 @@
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                   materialDesign:HintAssist.Hint="Тип криптовалюты"
          />
-        <TextBox x:Name="ProjectMessage" Margin="0 8 0 0" HorizontalAlignment="Stretch"
+        <TextBox x:Name="ProjectMessage" AcceptsReturn="True" Margin="0 8 0 0" HorizontalAlignment="Stretch"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         TextWrapping="Wrap" Height="150" VerticalScrollBarVisibility="Auto"
                         materialDesign:HintAssist.Hint = "Инструкция"/>

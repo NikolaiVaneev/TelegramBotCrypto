@@ -96,26 +96,30 @@ namespace TelegramBotCrypto.Services
                 string projectID = e.CallbackQuery.Data.Substring(0, e.CallbackQuery.Data.IndexOf("_register"));
                 Project project = DataBase.GetProject(int.Parse(projectID));
 
-                // Присвоить криптокошелек типа данного проекта, если его не было
-                Wallet userWallet = DataBase.GetWallet(user.User_Id, project.CryptoTypeId);
-                if (userWallet == null)
+                // Если в проекте используется кошелек
+                if (project.CryptoTypeId != 0)
                 {
-                    //Проверить, есть-ли вообще свободные кошельки
-                    List<Wallet> freeWallets = DataBase.GetFreeWallets(project.CryptoTypeId);
-                    if (freeWallets.Count > 0)
+                    // Присвоить криптокошелек типа данного проекта, если его не было
+                    Wallet userWallet = DataBase.GetWallet(user.User_Id, project.CryptoTypeId);
+                    if (userWallet == null)
                     {
-                        DataBase.AttachWallet(freeWallets[0].Id, user.User_Id);
-                        await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Вам присвоен {project.CryptoType.Title} кошелек - {freeWallets[0].Code}");
+                        //Проверить, есть-ли вообще свободные кошельки
+                        List<Wallet> freeWallets = DataBase.GetFreeWallets(project.CryptoTypeId);
+                        if (freeWallets.Count > 0)
+                        {
+                            DataBase.AttachWallet(freeWallets[0].Id, user.User_Id);
+                            await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Вам присвоен {project.CryptoType.Title} кошелек - {freeWallets[0].Code}");
+                        }
+                        else
+                        {
+                            await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"К сожалению, свободных {project.CryptoType.Title} кошельков пока нет. Попробуйте позже");
+                            return;
+                        }
                     }
                     else
                     {
-                        await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"К сожалению, свободных {project.CryptoType.Title} кошельков пока нет. Попробуйте позже");
-                        return;
+                        await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Ваш {project.CryptoType.Title} кошелек - {userWallet.Code}");
                     }
-                }
-                else
-                {
-                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Ваш {project.CryptoType.Title} кошелек - {userWallet.Code}");
                 }
 
                 // Добавить пользователя в проект
