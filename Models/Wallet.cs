@@ -8,12 +8,12 @@ namespace TelegramBotCrypto.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
         [Indexed]
-        public string CryptoTypeId { get; set; }
+        public int CryptoTypeId { get; set; }
         /// <summary>
         /// Адрес кошелька
         /// </summary>
         public string Code { get; set; }
-        public int UserId { get; set; }
+        public long UserId { get; set; }
         /// <summary>
         /// Владелец кошелька
         /// </summary>

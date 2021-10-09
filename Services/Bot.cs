@@ -45,26 +45,9 @@ namespace TelegramBotCrypto.Services
         }
 
         [Obsolete]
-        private static void BotOnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
+        private static async void BotOnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
         {
             var msg = e.CallbackQuery.Message;
-            if (e.CallbackQuery.Data == "need_help")
-            {
-                List<User> admins = DataBase.GetAdminAll();
-                Random random = new Random();
-                int selectedAdmin = random.Next(0, admins.Count - 1);
-
-                TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Для получения технической поддержки свяжитесь с @{admins[selectedAdmin].User_Nickname}");
-            }
-            else
-            {
-                TelegramBot.SendTextMessageAsync(msg.Chat.Id, DataBase.AnchorUser(msg.Chat.Id, e.CallbackQuery.Data));
-            }
-        }
-        [Obsolete]
-        private async static void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
-        {
-            Telegram.Bot.Types.Message msg = e.Message;
             User user = new User
             {
                 User_Id = msg.Chat.Id,
@@ -72,27 +55,101 @@ namespace TelegramBotCrypto.Services
                 User_FirstName = msg.Chat.FirstName,
                 User_LastName = msg.Chat.LastName
             };
-            DataBase.SaveUser(user);
 
-
-            if (msg.Photo != null || msg.Document != null)
+            // Если нужна помощь
+            if (e.CallbackQuery.Data == "need_help")
             {
-                // TODO: Отправить фото админам (и сохранить может быть?)
-                SendPhotoMessageAllAdmin(msg);
+                List<User> admins = DataBase.GetAdminAll();
+                Random random = new Random();
+                if (admins.Count > 0)
+                {
+                    int selectedAdmin = random.Next(0, admins.Count - 1);
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Для получения технической поддержки свяжитесь с @{admins[selectedAdmin].User_Nickname}");
+                }
+                else
+                {
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"К сожалению, свободные администраторы отсутствуют");
+                }
+                return;
             }
 
-            if (msg.Text == null) return;
+            // Если кликнули на проект
+            Project Project = DataBase.GetAllProjects().FirstOrDefault(u => u.Id.ToString() == e.CallbackQuery.Data);
+            if (Project != null)
+            {
+                await TelegramBot.SendTextMessageAsync(msg.Chat.Id, Project.Message);
+                List<List<InlineKeyboardButton>> buttons = new List<List<InlineKeyboardButton>>();
+                var list = new List<InlineKeyboardButton>
+                {
+                    InlineKeyboardButton.WithCallbackData("Да, принять участие!", $"{Project.Id}_register"),
+                    InlineKeyboardButton.WithCallbackData("Нет, к проектам", "comeback")
+                };
+                buttons.Add(list);
+                var ikm = new InlineKeyboardMarkup(buttons);
+                await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Примите участие?", replyMarkup: ikm);
+                //TelegramBot.SendTextMessageAsync(msg.Chat.Id, DataBase.AnchorUser(msg.Chat.Id, e.CallbackQuery.Data));
+            }
 
-            var cryptoTypes = DataBase.GetAllCryptoType();
+            // Если кликнули на "Принять участите"
+            if (e.CallbackQuery.Data.Contains("_register"))
+            {
+                string projectID = e.CallbackQuery.Data.Substring(0, e.CallbackQuery.Data.IndexOf("_register"));
+                Project project = DataBase.GetProject(int.Parse(projectID));
+
+                // Присвоить криптокошелек типа данного проекта, если его не было
+                Wallet userWallet = DataBase.GetWallet(user.User_Id, project.CryptoTypeId);
+                if (userWallet == null)
+                {
+                    //Проверить, есть-ли вообще свободные кошельки
+                    List<Wallet> freeWallets = DataBase.GetFreeWallets(project.CryptoTypeId);
+                    if (freeWallets.Count > 0)
+                    {
+                        DataBase.AttachWallet(freeWallets[0].Id, user.User_Id);
+                        await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Вам присвоен {project.CryptoType.Title} кошелек - {freeWallets[0].Code}");
+                    }
+                    else
+                    {
+                        await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"К сожалению, свободных {project.CryptoType.Title} кошельков пока нет. Попробуйте позже");
+                        return;
+                    }
+                }
+                else
+                {
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Ваш {project.CryptoType.Title} кошелек - {userWallet.Code}");
+                }
+
+                // Добавить пользователя в проект
+                // Если пользователь не участвует
+                if (!DataBase.GetParticipation(user.User_Id, project.Id))
+                {
+                    DataBase.AttachParticipation(project.Id, user.User_Id);
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Благодарим Вас за интерес к нашему проекту");
+                }
+                else
+                {
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Вы уже учавствуете в этом проекте :)");
+                }
+            }
+
+            // Возврат к списку проектов
+            if (e.CallbackQuery.Data == "comeback")
+            {
+                SendProjectList(user, msg);
+            }
+        }
+
+        private async static void SendProjectList(User user, Telegram.Bot.Types.Message msg)
+        {
+            var projects = DataBase.GetAllProjects();
 
 
             //List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
             List<List<InlineKeyboardButton>> buttons = new List<List<InlineKeyboardButton>>();
 
-            foreach (var type in cryptoTypes)
+            foreach (var project in projects)
             {
                 // По одной линии
-                var btn = InlineKeyboardButton.WithCallbackData(type.Title, type.Title);
+                var btn = InlineKeyboardButton.WithCallbackData(project.Title, project.Id.ToString());
                 var list = new List<InlineKeyboardButton>
                 {
                     btn
@@ -107,7 +164,7 @@ namespace TelegramBotCrypto.Services
             // Кнопка помощи
             var helpBtn = new List<InlineKeyboardButton>
             {
-                InlineKeyboardButton.WithCallbackData("Мне нужна помощь", "need_help")
+                InlineKeyboardButton.WithCallbackData($"Мне нужна помощь", "need_help")
             };
             buttons.Add(helpBtn);
 
@@ -138,6 +195,32 @@ namespace TelegramBotCrypto.Services
             {
                 Logger.Add($"Сообщение для {user.User_Nickname} НЕ отправлено");
             }
+        }
+
+        [Obsolete]
+        private static void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        {
+            Telegram.Bot.Types.Message msg = e.Message;
+            User user = new User
+            {
+                User_Id = msg.Chat.Id,
+                User_Nickname = msg.Chat.Username,
+                User_FirstName = msg.Chat.FirstName,
+                User_LastName = msg.Chat.LastName
+            };
+            DataBase.SaveUser(user);
+
+
+            if (msg.Photo != null || msg.Document != null)
+            {
+                // TODO: Отправить фото админам (и сохранить может быть?)
+                SendPhotoMessageAllAdmin(msg);
+                return;
+            }
+
+            if (msg.Text == null) return;
+            SendProjectList(user, msg);
+
         }
         public async static void SendPhotoMessageAllAdmin(Telegram.Bot.Types.Message msg)
         {

@@ -33,7 +33,7 @@ namespace TelegramBotCrypto.Data
                 connection.CreateTable<Wallet>();
                 connection.CreateTable<CryptoType>();
                 connection.CreateTable<Project>();
-                connection.CreateTable<Address>();
+                connection.CreateTable<Participation>();
             }
         }
 
@@ -52,6 +52,55 @@ namespace TelegramBotCrypto.Data
                 return list;
             };
         }
+
+        internal static void SaveProject(Project project)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                if (project.Id == 0)
+                    connection.Insert(project);
+                else
+                    connection.Update(project);
+            };
+        }
+
+        internal static void DeleteProject(Project project)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                connection.Delete(project);
+
+                //TODO : Удалять кроме проекта его участников
+                //connection.Execute($"DELETE FROM Crypto WHERE CryptoID = {project.Id}");
+            };
+        }
+
+        internal static IEnumerable<Participation> GetParticipationList(string finder = "")
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                List<Participation> list = new List<Participation>();
+                if (string.IsNullOrEmpty(finder))
+                    list = connection.Query<Participation>($"SELECT * FROM Participation JOIN User u ON u.User_id = Participation.UserId");
+                else
+                    list = connection.Query<Participation>($"SELECT * FROM Participation JOIN User u ON u.User_id = Participation.UserId " +
+                    $"WHERE User_Nickname LIKE '{finder}%' OR UserId LIKE '{finder}'");
+                
+                return list;
+            };
+        }
+
+        internal static List<Participation> GetParticipationProject(int projectId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                List<Participation> list = new List<Participation>();
+                list = connection.Query<Participation>($"SELECT * FROM Participation WHERE ProjectId = {projectId}");
+                return list;
+            };
+        }
+
+
         /// <summary>
         /// Изменить статус пользователя
         /// </summary>
@@ -63,6 +112,33 @@ namespace TelegramBotCrypto.Data
                 connection.Query<User>($"UPDATE User SET User_Status = '{user.User_Status}' WHERE User_id = {user.User_Id}");
             };
         }
+
+        /// <summary>
+        /// Получить все проекты
+        /// </summary>
+        /// <returns></returns>
+        internal static List<Project> GetAllProjects()
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                List<Project> list = new List<Project>();
+                list = connection.Query<Project>("SELECT * FROM Project");
+                return list;
+            };
+        }
+
+        /// <summary>
+        /// Получить список проектов
+        /// </summary>
+        /// <returns></returns>
+        internal static List<Project> GetProjects()
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                return connection.Query<Project>($"SELECT * FROM Project");
+            };
+        }
+
         /// <summary>
         /// Получить пользователя по ИД
         /// </summary>
@@ -75,6 +151,77 @@ namespace TelegramBotCrypto.Data
                 return connection.Query<User>($"SELECT * FROM User WHERE User_Id = {userId}").FirstOrDefault();
             };
         }
+
+        /// <summary>
+        /// Получить свободные кошельки по ИД криптовалюты
+        /// </summary>
+        /// <param name="cryptoTypeId">ИД криптовалюты</param>
+        /// <returns></returns>
+        internal static List<Wallet> GetFreeWallets(int cryptoTypeId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                List<Wallet> list = new List<Wallet>();
+                list = connection.Query<Wallet>($"SELECT * FROM Wallet WHERE UserId = 0 AND CryptoTypeId = {cryptoTypeId}");
+                return list;
+            };
+        }
+
+        /// <summary>
+        /// Присоединить к пользователю кошелек
+        /// </summary>
+        /// <param name="id">ИД кошелька</param>
+        /// <param name="user_Id">ИД пользователя</param>
+        internal static void AttachWallet(int id, long user_Id)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                connection.Query<Wallet>($"UPDATE Wallet SET UserId = {user_Id} WHERE Id = {id}");
+            }
+        }
+
+        internal static void AttachParticipation(int projectId, long userId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                Participation participation = new Participation
+                {
+                    ProjectId = projectId,
+                    UserId = userId
+                };
+                connection.Insert(participation);
+            };
+        }
+
+        /// <summary>
+        /// Учавствует-ли пользователь в проекте?
+        /// </summary>
+        /// <param name="user_Id">ИД пользователя</param>
+        /// <param name="id">ИД проекта</param>
+        /// <returns></returns>
+        internal static bool GetParticipation(long userId, int id)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                Participation participation = connection.Query<Participation>($"SELECT * FROM Participation WHERE Id = {id} AND UserId = {userId}").FirstOrDefault();
+                return participation != null;
+            };
+        }
+
+        /// <summary>
+        /// Получить кошелек пользователя по типу валюты
+        /// </summary>
+        /// <param name="user_Id">ИД пользователя</param>
+        /// <param name="cryptoTypeId">ИД валюты</param>
+        /// <returns></returns>
+        internal static Wallet GetWallet(long userId, int cryptoTypeId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                return connection.Query<Wallet>($"SELECT * FROM Wallet WHERE UserId = {userId} AND CryptoTypeId = {cryptoTypeId}").FirstOrDefault();
+            };
+        }
+
         /// <summary>
         /// Получить список пользователей
         /// </summary>
@@ -117,7 +264,7 @@ namespace TelegramBotCrypto.Data
         #region Тип криптовалюты
 
         /// <summary>
-        /// Добавить тип криптовалюты
+        /// Сохранить тип криптовалюты
         /// </summary>
         /// <param name="cryptoType">Название</param>
         internal static void SaveCryptoType(CryptoType cryptoType)
@@ -140,7 +287,7 @@ namespace TelegramBotCrypto.Data
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
             {
                 connection.Delete(cryptoType);
-                connection.Execute($"DELETE FROM Crypto WHERE CryptoID = {cryptoType.Id}");
+                connection.Execute($"DELETE FROM Wallet WHERE CryptoTypeId = {cryptoType.Id}");
             };
         }
 
@@ -154,6 +301,18 @@ namespace TelegramBotCrypto.Data
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
             {
                 return connection.Query<CryptoType>($"SELECT * FROM CryptoType WHERE Title LIKE \"{title}\"").FirstOrDefault();
+            };
+        }
+        /// <summary>
+        /// Получить тип криптовалюты по ID
+        /// </summary>
+        /// <param name="id">ID</param>
+        /// <returns></returns>
+        internal static CryptoType GetCryptoTypeData(int id)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                return connection.Query<CryptoType>($"SELECT * FROM CryptoType WHERE ID = {id}").FirstOrDefault();
             };
         }
         public static List<CryptoType> GetAllCryptoType()
@@ -207,9 +366,6 @@ namespace TelegramBotCrypto.Data
                 return list;
             };
         }
-
-
-
         internal static void AddCryptoAddressCollection(List<Wallet> list)
         {
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
@@ -217,7 +373,6 @@ namespace TelegramBotCrypto.Data
                 connection.InsertAll(list);
             };
         }
-
         public static string AnchorUser(long id, string cryptoName)
         {
             StringBuilder message = new StringBuilder();
@@ -287,8 +442,6 @@ namespace TelegramBotCrypto.Data
                 return connection.Query<Wallet>($"SELECT * FROM Crypto WHERE UserId = {userId}").FirstOrDefault();
             };
         }
-
-
 
     }
 }

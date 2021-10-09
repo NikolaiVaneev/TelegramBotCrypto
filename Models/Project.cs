@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using TelegramBotCrypto.Data;
 
 namespace TelegramBotCrypto.Models
 {
@@ -14,5 +15,20 @@ namespace TelegramBotCrypto.Models
         /// Приветственное сообщение
         /// </summary>
         public string Message { get; set; }
+        public int CryptoTypeId { get; set; }
+        public CryptoType CryptoType
+        {
+            get
+            {
+                if (CryptoTypeId != 0)
+                {
+                    return DataBase.GetCryptoTypeData(CryptoTypeId);
+                }
+                else
+                {
+                    return new CryptoType();
+                }
+            }
+        }
     }
 }

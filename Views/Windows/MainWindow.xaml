@@ -55,7 +55,9 @@
             <MenuItem Header="Списки">
                 <MenuItem Header="Пользователи" Command="{Binding OpenUsersListCommand}"/>
                 <MenuItem Header="Тип криптовалют" Command="{Binding OpenCryptoTypeListCommand}" />
-                <MenuItem Header="Адреса" Command="{Binding OpenCryptoListCommand}" />
+                <MenuItem Header="Кошельки" Command="{Binding OpenCryptoListCommand}" />
+                <MenuItem Header="Проекты" Command="{Binding OpenProjectListCommand}" />
+                <MenuItem Header="Участники" Command="{Binding OpenParticipationPageCommand}" />
             </MenuItem>
             <MenuItem Header="Сообщения" Command="{Binding OpenMessagesCommand}"/>
             <MenuItem Header="Настройки" Command="{Binding OpenSettingsCommand}"/>

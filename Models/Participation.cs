@@ -3,7 +3,7 @@ using TelegramBotCrypto.Data;
 
 namespace TelegramBotCrypto.Models
 {
-    public class Address
+    public class Participation
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
@@ -27,5 +27,22 @@ namespace TelegramBotCrypto.Models
                     return new Project();
             }
         }
+   
+        public long UserId { get; set; }
+        public User User
+        {
+            get
+            {
+                if (UserId != 0)
+                {
+                    return DataBase.GetUser(UserId);
+                }
+                else
+                {
+                    return new User();
+                }
+            }
+        }
+
     }
 }

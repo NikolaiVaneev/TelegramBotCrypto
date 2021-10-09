@@ -55,6 +55,10 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=4.2.1.2, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>packages\MaterialDesignThemes.4.2.1\lib\net452\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Xaml.Behaviors.Wpf.1.1.37\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
@@ -110,6 +114,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Dialogs\ProjectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Pages\CryptoView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -119,6 +127,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\MessagesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\ParticipationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\ProjectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -146,7 +162,7 @@
     <Compile Include="Infrastructure\Commands\Base\Command.cs" />
     <Compile Include="Infrastructure\Commands\CloseApplicationCommand.cs" />
     <Compile Include="Infrastructure\Commands\RelayCommand.cs" />
-    <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\Participation.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\Wallet.cs" />
     <Compile Include="Models\CryptoType.cs" />
@@ -164,6 +180,8 @@
     <Compile Include="ViewModels\Pages\CryptoViewModel.cs" />
     <Compile Include="ViewModels\Pages\LogViewModel.cs" />
     <Compile Include="ViewModels\Pages\MessageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\ParticipationViewModel.cs" />
+    <Compile Include="ViewModels\Pages\ProjectViewModel.cs" />
     <Compile Include="ViewModels\Pages\SettingsViewModel.cs" />
     <Compile Include="ViewModels\Pages\UsersViewModel.cs" />
     <Compile Include="ViewModels\Windows\MainViewModel.cs" />
@@ -173,6 +191,9 @@
     <Compile Include="Views\Dialogs\ProgressBarDialog.xaml.cs">
       <DependentUpon>ProgressBarDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialogs\ProjectDialog.xaml.cs">
+      <DependentUpon>ProjectDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Pages\CryptoView.xaml.cs">
       <DependentUpon>CryptoView.xaml</DependentUpon>
     </Compile>
@@ -181,6 +202,12 @@
     </Compile>
     <Compile Include="Views\Pages\MessagesView.xaml.cs">
       <DependentUpon>MessagesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\ParticipationView.xaml.cs">
+      <DependentUpon>ParticipationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\ProjectView.xaml.cs">
+      <DependentUpon>ProjectView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>

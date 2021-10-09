@@ -94,7 +94,7 @@ namespace TelegramBotCrypto.ViewModels.Pages
                 await Task.Run(() =>
                 {
                     CryptoType cryptoType = DataBase.GetCryptoTypeData(SelectedCryptoType);
-                    List<Wallet> list = ExcelWorker.GetData(ofd.FileName, cryptoType.Id.ToString());
+                    List<Wallet> list = ExcelWorker.GetData(ofd.FileName, cryptoType.Id);
                     DataBase.AddCryptoAddressCollection(list);
                     LoadCryptoTypeList();
            

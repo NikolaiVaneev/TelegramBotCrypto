@@ -1,8 +1,5 @@
 ﻿using MaterialDesignThemes.Wpf;
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using TelegramBotCrypto.Data;
 using TelegramBotCrypto.Infrastructure.Commands;
@@ -64,7 +61,11 @@ namespace TelegramBotCrypto.ViewModels.Pages
             get => _isDialogOpen;
             set
             {
-                if (!value) LoadCryptoTypeList();
+                if (!value)
+                {
+                    LoadCryptoTypeList();
+                }
+
                 SetProperty(ref _isDialogOpen, value);
             }
 

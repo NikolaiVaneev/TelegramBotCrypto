@@ -80,12 +80,28 @@ namespace TelegramBotCrypto.ViewModels
             Content = new CryptoView();
         }
         #endregion
-        #region Открыть список криптовалют
+        #region Открыть сообщения
         public ICommand OpenMessagesCommand { get; }
         private bool CanOpenMessagesCommandExcecut(object p) => true;
         private void OnOpenMessagesCommandExecuted(object p)
         {
             Content = new MessagesView();
+        }
+        #endregion
+        #region Открыть проекты
+        public ICommand OpenProjectListCommand { get; }
+        private bool CanOpenProjectListCommandExcecut(object p) => true;
+        private void OnOpenProjectListCommandExecuted(object p)
+        {
+            Content = new ProjectView();
+        }
+        #endregion
+        #region Открыть участников
+        public ICommand OpenParticipationPageCommand { get; }
+        private bool CanOpenParticipationPageCommandExcecut(object p) => true;
+        private void OnOpenParticipationPageCommandExecuted(object p)
+        {
+            Content = new ParticipationView();
         }
         #endregion
         #region Открыть логи
@@ -115,8 +131,10 @@ namespace TelegramBotCrypto.ViewModels
             OpenSettingsCommand = new RelayCommand(OnOpenSettingsCommandExecuted, CanOpenSettingsCommandExcecut);
             OpenCryptoTypeListCommand = new RelayCommand(OnOpenCryptoTypeListCommandExecuted, CanOpenCryptoTypeListCommandExcecut);
             OpenCryptoListCommand = new RelayCommand(OnOpenCryptoListCommandExecuted, CanOpenCryptoListCommandExcecut);
+            OpenProjectListCommand = new RelayCommand(OnOpenProjectListCommandExecuted, CanOpenProjectListCommandExcecut);
             OpenMessagesCommand = new RelayCommand(OnOpenMessagesCommandExecuted, CanOpenMessagesCommandExcecut);
             OpenLogPageCommand = new RelayCommand(OnOpenLogPageCommandExecuted, CanOpenLogPageCommandExcecut);
+            OpenParticipationPageCommand = new RelayCommand(OnOpenParticipationPageCommandExecuted, CanOpenParticipationPageCommandExcecut);
 
             #endregion
         }
