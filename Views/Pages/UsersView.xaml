@@ -29,14 +29,17 @@
                 <DataGridTextColumn Header="Имя" IsReadOnly="True" Binding="{Binding Path=User_FirstName}"/>
                 <DataGridTextColumn Header="Фамилия" IsReadOnly="True" Binding="{Binding Path=User_LastName}"/>
                 <DataGridTextColumn Header="Телефон" IsReadOnly="True" Binding="{Binding Path=User_Phone}"/>
-                <DataGridCheckBoxColumn 
+                <DataGridCheckBoxColumn
+
                     Binding="{Binding User_Status, UpdateSourceTrigger=PropertyChanged}"
                     ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
                     EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}">
                     <DataGridCheckBoxColumn.Header>
                         <TextBlock Text="Администратор"/>
                     </DataGridCheckBoxColumn.Header>
+                    
                 </DataGridCheckBoxColumn>
+                    
             </DataGrid.Columns>
         </DataGrid>
         <materialDesign:ColorZone 

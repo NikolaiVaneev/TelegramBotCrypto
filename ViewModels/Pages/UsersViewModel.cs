@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TelegramBotCrypto.Data;
 using TelegramBotCrypto.Models;
 using TelegramBotCrypto.Services;
@@ -9,16 +10,18 @@ namespace TelegramBotCrypto.ViewModels.Pages
     class UsersViewModel : ViewModel
     {
         private IEnumerable<User> _userList;
-        public IEnumerable<User> UserList 
+        public IEnumerable<User> UserList
         {
             get => _userList;
             set => SetProperty(ref _userList, value);
-        } 
+        }
+
+
 
         #region Поисковая строка
         private string _searchBar;
         public string SearchBar
-        { 
+        {
             get => _searchBar;
             set
             {
@@ -29,7 +32,7 @@ namespace TelegramBotCrypto.ViewModels.Pages
                 }
                 else
                 {
-                    InitUserList();
+                    InitUserListAcync();
                 }
             }
         }
@@ -37,13 +40,17 @@ namespace TelegramBotCrypto.ViewModels.Pages
 
         public UsersViewModel()
         {
-            InitUserList();
+            InitUserListAcync();
         }
-        private void InitUserList()
+        private async void InitUserListAcync()
         {
-            UserList = DataBase.GetUserList();
+            await Task.Run(() =>
+            {
+                List<User> users = DataBase.GetUserList();
+                UserList = users;
+            });
         }
     }
 
-    
+
 }

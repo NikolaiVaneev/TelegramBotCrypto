@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using TelegramBotCrypto.Models;
 using TelegramBotCrypto.Services;
@@ -105,12 +106,15 @@ namespace TelegramBotCrypto.Data
         /// Изменить статус пользователя
         /// </summary>
         /// <param name="user"></param>
-        public static void ChangeUserStatus(User user)
+        public async static void ChangeUserStatusAcync(User user)
         {
-            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            await Task.Run(() =>
             {
-                connection.Query<User>($"UPDATE User SET User_Status = '{user.User_Status}' WHERE User_id = {user.User_Id}");
-            };
+                using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+                {
+                    connection.Query<User>($"UPDATE User SET User_Status = '{user.User_Status}' WHERE User_id = {user.User_Id}");
+                };
+            });
         }
 
         /// <summary>
