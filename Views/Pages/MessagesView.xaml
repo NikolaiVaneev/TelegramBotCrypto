@@ -14,16 +14,19 @@
     </ContentControl.DataContext>
     
     <StackPanel Orientation="Vertical" Background="WhiteSmoke">
-        <TextBox x:Name="message" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10"
+        <TextBox x:Name="message"  VerticalAlignment="Top" Margin="10"
                  Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}"
                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 
+                 TextWrapping="Wrap" Height="125" VerticalScrollBarVisibility="Auto"
+                 
                  materialDesign:HintAssist.Hint="Сообщение"/>
-        <ComboBox Width="200" Margin="5"
+        <ComboBox Width="200" Margin="10 0"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                   materialDesign:HintAssist.Hint="Адресат"
                   SelectedIndex="{Binding SelectedRecipient}"
                   ItemsSource="{Binding RecipientsType}"/>
-        <ComboBox Width="200" Margin="5"
+        <ComboBox Width="200" Margin="10 2"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                   materialDesign:HintAssist.Hint="Проект"
                   SelectedItem="{Binding SelectedProject}"
