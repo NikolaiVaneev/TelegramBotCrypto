@@ -215,7 +215,6 @@ namespace TelegramBotCrypto.Services
             };
             DataBase.SaveUser(user);
 
-
             if (msg.Photo != null || msg.Document != null)
             {
                 // TODO: Отправить фото админам (и сохранить может быть?)
@@ -337,7 +336,7 @@ namespace TelegramBotCrypto.Services
                         default:
                             break;
                     }
-                   
+
                     foreach (var item in participations)
                     {
                         FromUser.Add(item.User);
@@ -362,36 +361,37 @@ namespace TelegramBotCrypto.Services
                 }
 
                 foreach (var user in FromUser)
+                {
+                    try
                     {
-                        try
-                        {
 
-                            TelegramBot.SendTextMessageAsync(user.User_Id, message);
-                            Logger.Add($"Сообщение пользователю {user.User_Nickname} ({user.User_Id}) отправлено");
-                            SendedMessage.Add(user);
+                        Task<Telegram.Bot.Types.Message> sentMessage = TelegramBot.SendTextMessageAsync(user.User_Id, message);
+                        Logger.Add($"Сообщение пользователю {user.User_Nickname} ({user.User_Id}) отправлено");
+                        SendedMessage.Add(user);
 
-                        }
-                        catch
-                        {
-                            Logger.Add($"Сообщение для {user.User_Nickname} ({user.User_Id}) НЕ отправлено");
-                            NotSendedMessage.Add(user);
-                        }
                     }
+                    catch
+                    {
+                        Logger.Add($"Сообщение для {user.User_Nickname} ({user.User_Id}) НЕ отправлено");
+                        NotSendedMessage.Add(user);
+                    }
+                }
 
-                
+                Logger.Add($"Всего сообщений - {FromUser.Count}, доставлено - {SendedMessage.Count}, не доставлено - {NotSendedMessage.Count}");
+                //TODO : Вывод в эксель
+                ExcelWorker.ShowSendingReport(SendedMessage, NotSendedMessage);
 
                 //SendMessagesAllAsync($"{cryptoType.Title}{Environment.NewLine}{message}", 1);
             });
 
         }
-
         public async static void SendMessageAsync(User user, string message)
         {
             await Task.Run(() =>
             {
                 try
                 {
-                    TelegramBot.SendTextMessageAsync(user.User_Id, message);
+                    Task<Telegram.Bot.Types.Message> sentMessage = TelegramBot.SendTextMessageAsync(user.User_Id, message);
                     Logger.Add($"Сообщение пользователю {user.User_Nickname} ({user.User_Id}) отправлено");
                 }
                 catch

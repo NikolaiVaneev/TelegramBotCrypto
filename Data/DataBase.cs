@@ -84,9 +84,12 @@ namespace TelegramBotCrypto.Data
                 if (string.IsNullOrEmpty(finder))
                     list = connection.Query<Participation>($"SELECT * FROM Participation JOIN User u ON u.User_id = Participation.UserId");
                 else
-                    list = connection.Query<Participation>($"SELECT * FROM Participation JOIN User u ON u.User_id = Participation.UserId " +
-                    $"WHERE User_Nickname LIKE '{finder}%' OR UserId LIKE '{finder}'");
-                
+                {
+                    string query = "SELECT * FROM Participation JOIN User u ON u.User_id = Participation.UserId WHERE User_Nickname LIKE ? OR UserId LIKE ?;";
+                        list = connection.Query<Participation>(query, new string[] { "%" + finder + "%", "%" + finder + "%" });
+                }
+                    
+
                 return list;
             };
         }
@@ -230,15 +233,37 @@ namespace TelegramBotCrypto.Data
         /// Получить список пользователей
         /// </summary>
         /// <returns></returns>
-        public static List<User> GetUserList()
+        //public static List<User> GetUserList()
+        //{
+        //    using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+        //    {
+        //        List<User> list = new List<User>();
+        //        list = connection.Query<User>("SELECT * FROM User");
+        //        return list;
+        //    };
+        //}
+
+
+        public static List<User> GetUserList(string filter = "")
         {
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
             {
                 List<User> list = new List<User>();
-                list = connection.Query<User>("SELECT * FROM User");
+
+                if (!string.IsNullOrWhiteSpace(filter))
+                {
+                    string query = "SELECT * FROM User WHERE User_Nickname LIKE ? OR User_Id LIKE ?;";
+                    list = connection.Query<User>(query, new string[] { "%" + filter + "%", "%" + filter + "%" });
+                }
+                else
+                {
+                    list = connection.Query<User>("SELECT * FROM User");
+                }
+
                 return list;
             };
         }
+
         /// <summary>
         /// Сохранить пользователя в БД
         /// </summary>

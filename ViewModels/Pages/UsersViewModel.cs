@@ -28,7 +28,8 @@ namespace TelegramBotCrypto.ViewModels.Pages
                 SetProperty(ref _searchBar, value);
                 if (SearchBar.Length > 0)
                 {
-                    UserList = UserList.Where(u => u.User_Nickname.ToLower().Contains(SearchBar.ToLower()) || u.User_Id.ToString().Contains(SearchBar));
+                    //UserList = UserList.Where(u => u.User_Nickname.ToLower().Contains(SearchBar.ToLower()) || u.User_Id.ToString().Contains(SearchBar));
+                    UserList = DataBase.GetUserList(SearchBar);
                 }
                 else
                 {
