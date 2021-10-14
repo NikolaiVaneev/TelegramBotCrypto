@@ -23,6 +23,13 @@
                   materialDesign:HintAssist.Hint="Адресат"
                   SelectedIndex="{Binding SelectedRecipient}"
                   ItemsSource="{Binding RecipientsType}"/>
+        <ComboBox Width="200" Margin="5"
+                  Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                  materialDesign:HintAssist.Hint="Проект"
+                  SelectedItem="{Binding SelectedProject}"
+                  DisplayMemberPath="Title"
+                  ItemsSource="{Binding ProjectsList}"/>
+        
         <!--<ComboBox Width="200" Margin="5"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                   materialDesign:HintAssist.Hint="Тип валюты"

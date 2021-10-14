@@ -50,6 +50,7 @@ namespace TelegramBotCrypto.ViewModels.Pages
             set => SetProperty(ref _selectedRecipient, value);
         }
         #endregion
+
         #region Список валют (не исп)
         public IEnumerable<CryptoType> CryptoTypes
         {
@@ -67,20 +68,38 @@ namespace TelegramBotCrypto.ViewModels.Pages
             set => SetProperty(ref _selectedCryptoType, value);
         }
         #endregion
-       
+
+        #region Список проектов
+        private IEnumerable<Project> _projectList;
+        public IEnumerable<Project> ProjectsList
+        {
+            get => _projectList;
+            set => SetProperty(ref _projectList, value);
+        }
+        #endregion
+        #region Выбраный проект
+        private Project _selectedProject;
+        public Project SelectedProject
+        {
+            get => _selectedProject;
+            set => SetProperty(ref _selectedProject, value);
+        }
+        #endregion
+
         /// Команды
         #region Отправить сообщения
         public ICommand SendMessagesCommand { get; }
         private bool CanSendMessagesCommandExcecut(object p) => true;
         private void OnSendMessagesCommandExecuted(object p)
         {
-            Bot.SendMessagesAllAsync(Message, SelectedRecipient);
+            Bot.SendMessagesAllAsync(Message, SelectedRecipient, SelectedProject);
            // Bot.SendMessagesAllAsync(Message, SelectedCryptoType);
         }
         #endregion
 
         public MessageViewModel()
         {
+            ProjectsList = DataBase.GetAllProjects();
             SendMessagesCommand = new RelayCommand(OnSendMessagesCommandExecuted, CanSendMessagesCommandExcecut);
         }
     }

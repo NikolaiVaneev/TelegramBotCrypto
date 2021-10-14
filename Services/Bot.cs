@@ -124,14 +124,15 @@ namespace TelegramBotCrypto.Services
 
                 // Добавить пользователя в проект
                 // Если пользователь не участвует
-                if (!DataBase.GetParticipation(user.User_Id, project.Id))
+                bool isNewMember = DataBase.GetParticipation(user.User_Id, project.Id);
+                if (isNewMember)
                 {
                     DataBase.AttachParticipation(project.Id, user.User_Id);
-                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Благодарим Вас за интерес к нашему проекту");
+                    SendMessageAsync(user, "Благодарим Вас за интерес к нашему проекту");
                 }
                 else
                 {
-                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Вы уже учавствуете в этом проекте :)");
+                    SendMessageAsync(user, "Вы уже учавствуете в этом проекте :)");
                 }
             }
 
@@ -301,43 +302,84 @@ namespace TelegramBotCrypto.Services
         }
 
         /// <summary>
-        /// Отправить сообщения по типу криптовалют
+        /// Отправить сообщение всем пользователям
         /// </summary>
-        /// <param name="message">Текст сообщения</param>
-        /// <param name="cryptoType">Тип криптовалюты</param>
-        public async static void SendMessagesAllAsync(string message, CryptoType cryptoType)
+        /// <param name="message">Сообщение</param>
+        /// <param name="recipientsType">Кому</param>
+        /// <param name="project">Проект</param>
+        public async static void SendMessagesAllAsync(string message, int recipientsType, Project project)
         {
-            if (cryptoType == null || string.IsNullOrEmpty(message))
+            if (string.IsNullOrEmpty(message))
             {
                 return;
             }
 
             await Task.Run(() =>
             {
-                IEnumerable<User> users = DataBase.GetUserList();
-                IEnumerable<Wallet> cryptos = DataBase.GetAllCryptoAddress(cryptoType.Title);
+                List<User> SendedMessage = new List<User>();
+                List<User> NotSendedMessage = new List<User>();
 
-                if (cryptos.Count() == 0) return;
 
-                foreach (var crypto in cryptos)
+                if (project != null)
                 {
-                    try
+                    List<Participation> participations = DataBase.GetParticipationList().Where(u => u.ProjectId == project.Id).Where(u => u.User.User_Status == recipientsType).ToList();
+                    foreach (Participation participation in participations)
                     {
-                        if (crypto.UserId != 0 && crypto.User.User_Status == 0)
+                        try
                         {
-                            TelegramBot.SendTextMessageAsync(crypto.UserId, message);
-                            Logger.Add($"Сообщение пользователю {crypto.User.User_Nickname} ({crypto.User.User_Id}) отправлено");
+
+                            TelegramBot.SendTextMessageAsync(participation.UserId, message);
+                            Logger.Add($"Сообщение пользователю {participation.User.User_Nickname} ({participation.User.User_Id}) отправлено");
+                            SendedMessage.Add(participation.User);
+
+                        }
+                        catch
+                        {
+                            Logger.Add($"Сообщение для {participation.User.User_Nickname} ({participation.User.User_Id}) НЕ отправлено");
+                            NotSendedMessage.Add(participation.User);
                         }
                     }
-                    catch
-                    {
-                        Logger.Add($"Сообщение для {crypto.User.User_Nickname} ({crypto.User.User_Id}) НЕ отправлено");
-                    }
                 }
+                //IEnumerable<User> users = DataBase.GetUserList();
+                //IEnumerable<Wallet> cryptos = DataBase.GetAllCryptoAddress(cryptoType.Title);
 
-                SendMessagesAllAsync($"{cryptoType.Title}{Environment.NewLine}{message}", 1);
+                //if (cryptos.Count() == 0) return;
+
+                //foreach (var crypto in cryptos)
+                //{
+                //    try
+                //    {
+                //        if (crypto.UserId != 0 && crypto.User.User_Status == 0)
+                //        {
+                //            TelegramBot.SendTextMessageAsync(crypto.UserId, message);
+                //            Logger.Add($"Сообщение пользователю {crypto.User.User_Nickname} ({crypto.User.User_Id}) отправлено");
+                //        }
+                //    }
+                //    catch
+                //    {
+                //        Logger.Add($"Сообщение для {crypto.User.User_Nickname} ({crypto.User.User_Id}) НЕ отправлено");
+                //    }
+                //}
+
+                //SendMessagesAllAsync($"{cryptoType.Title}{Environment.NewLine}{message}", 1);
             });
 
+        }
+    
+        public async static void SendMessageAsync(User user, string message)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    TelegramBot.SendTextMessageAsync(user.User_Id, message);
+                    Logger.Add($"Сообщение пользователю {user.User_Nickname} ({user.User_Id}) отправлено");
+                }
+                catch
+                {
+                    Logger.Add($"Сообщение для {user.User_Nickname} ({user.User_Id}) НЕ отправлено");
+                }
+            });
         }
     }
 }

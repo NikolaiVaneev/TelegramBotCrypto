@@ -76,7 +76,7 @@ namespace TelegramBotCrypto.Data
             };
         }
 
-        internal static IEnumerable<Participation> GetParticipationList(string finder = "")
+        internal static List<Participation> GetParticipationList(string finder = "")
         {
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
             {
@@ -207,8 +207,8 @@ namespace TelegramBotCrypto.Data
         {
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
             {
-                Participation participation = connection.Query<Participation>($"SELECT * FROM Participation WHERE Id = {id} AND UserId = {userId}").FirstOrDefault();
-                return participation != null;
+                Participation participation = connection.Query<Participation>($"SELECT * FROM Participation WHERE ProjectId = {id} AND UserId = {userId}").FirstOrDefault();
+                return participation == null;
             };
         }
 
