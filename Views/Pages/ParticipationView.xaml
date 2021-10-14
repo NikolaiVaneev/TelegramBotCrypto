@@ -16,7 +16,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DataGrid IsReadOnly="True"
+        <DataGrid x:Name="List" IsReadOnly="True"
             ItemsSource="{Binding ParticipationList}"
             CanUserSortColumns="True"
             CanUserAddRows="False"
@@ -29,7 +29,7 @@
         </DataGrid>
 
         <materialDesign:ColorZone Mode="PrimaryMid" Grid.Row="1" Effect="{DynamicResource MaterialDesignShadowDepth5}">
-            <TextBlock Margin="16" Text="Участники проекта"/>
+            <TextBlock Margin="16" Text="{Binding StringFormat=Всего пользователей - {0}, ElementName=List, Path=Items.Count}"/>
 
         </materialDesign:ColorZone>
         <ComboBox VerticalAlignment="Bottom" HorizontalAlignment="Right" 

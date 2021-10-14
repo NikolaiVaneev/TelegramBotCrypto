@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <DataGrid  Grid.Row="0"
+        <DataGrid x:Name="List" Grid.Row="0"
             ItemsSource="{Binding UserList}"
             CanUserSortColumns="True"
             CanUserAddRows="False"
@@ -45,8 +45,8 @@
         <materialDesign:ColorZone 
             Panel.ZIndex="0"
             Grid.Row="1" Mode="PrimaryMid" Effect="{DynamicResource MaterialDesignShadowDepth5}">
-            <TextBlock Margin="16" Text="Список пользователей"/>
-          
+            <TextBlock Margin="16" Text="{Binding StringFormat=Всего пользователей - {0}, ElementName=List, Path=Items.Count}"/>
+
         </materialDesign:ColorZone>
         <TextBox Grid.Row="1" Width="200" VerticalAlignment="Center" Panel.ZIndex="1"
                  Text="{Binding SearchBar, UpdateSourceTrigger=PropertyChanged}" 
