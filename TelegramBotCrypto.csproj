@@ -162,6 +162,7 @@
     <Compile Include="Infrastructure\Commands\Base\Command.cs" />
     <Compile Include="Infrastructure\Commands\CloseApplicationCommand.cs" />
     <Compile Include="Infrastructure\Commands\RelayCommand.cs" />
+    <Compile Include="Models\DiliveryStatus.cs" />
     <Compile Include="Models\Participation.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\Wallet.cs" />

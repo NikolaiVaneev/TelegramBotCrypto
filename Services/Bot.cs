@@ -313,12 +313,17 @@ namespace TelegramBotCrypto.Services
                 return;
             }
 
+            List<DiliveryStatus> diliveries = new List<DiliveryStatus>();
+            List<User> SendedMessage = new List<User>();
+            List<User> NotSendedMessage = new List<User>();
+            List<User> FromUser = new List<User>();
+
             await Task.Run(() =>
             {
-                List<User> SendedMessage = new List<User>();
-                List<User> NotSendedMessage = new List<User>();
+
                 List<Participation> participations = new List<Participation>();
-                List<User> FromUser = new List<User>();
+
+
                 // Если выбран проект
                 if (project != null)
                 {
@@ -362,13 +367,17 @@ namespace TelegramBotCrypto.Services
 
                 foreach (var user in FromUser)
                 {
+                    Task<Telegram.Bot.Types.Message> sentMessage = default;
+               
+
+                        sentMessage = TelegramBot.SendTextMessageAsync(user.User_Id, message);
+                  
+
                     try
                     {
-
-                        Task<Telegram.Bot.Types.Message> sentMessage = TelegramBot.SendTextMessageAsync(user.User_Id, message);
+                        var r = sentMessage.Result;
                         Logger.Add($"Сообщение пользователю {user.User_Nickname} ({user.User_Id}) отправлено");
                         SendedMessage.Add(user);
-
                     }
                     catch
                     {
@@ -377,12 +386,14 @@ namespace TelegramBotCrypto.Services
                     }
                 }
 
-                Logger.Add($"Всего сообщений - {FromUser.Count}, доставлено - {SendedMessage.Count}, не доставлено - {NotSendedMessage.Count}");
-                //TODO : Вывод в эксель
-                ExcelWorker.ShowSendingReport(SendedMessage, NotSendedMessage);
 
                 //SendMessagesAllAsync($"{cryptoType.Title}{Environment.NewLine}{message}", 1);
             });
+            Logger.Add($"Всего сообщений - {FromUser.Count}, доставлено - {SendedMessage.Count}, не доставлено - {NotSendedMessage.Count}");
+            //TODO : Вывод в эксель
+            ExcelWorker.ShowSendingReport(SendedMessage, NotSendedMessage);
+  
+    
 
         }
         public async static void SendMessageAsync(User user, string message)
