@@ -9,7 +9,6 @@ using TelegramBotCrypto.Models;
 
 namespace TelegramBotCrypto.Services
 {
-
     internal static class Bot
     {
         public static TelegramBotClient TelegramBot { get; set; }
@@ -77,6 +76,11 @@ namespace TelegramBotCrypto.Services
             Project Project = DataBase.GetAllProjects().FirstOrDefault(u => u.Id.ToString() == e.CallbackQuery.Data);
             if (Project != null)
             {
+                if (Project.IsCompletion)
+                {
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"К сожалению, данный проект уже завершен");
+                    return;
+                }
                 await TelegramBot.SendTextMessageAsync(msg.Chat.Id, Project.Message);
                 List<List<InlineKeyboardButton>> buttons = new List<List<InlineKeyboardButton>>();
                 var list = new List<InlineKeyboardButton>
@@ -95,6 +99,12 @@ namespace TelegramBotCrypto.Services
             {
                 string projectID = e.CallbackQuery.Data.Substring(0, e.CallbackQuery.Data.IndexOf("_register"));
                 Project project = DataBase.GetProject(int.Parse(projectID));
+
+                if (project.IsCompletion)
+                {
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"К сожалению, данный проект уже завершен");
+                    return;
+                }
 
                 // Если в проекте используется кошелек
                 if (project.CryptoTypeId != 0)
@@ -142,11 +152,9 @@ namespace TelegramBotCrypto.Services
                 SendProjectList(user, msg);
             }
         }
-
         private async static void SendProjectList(User user, Telegram.Bot.Types.Message msg)
         {
-            var projects = DataBase.GetAllProjects();
-
+            var projects = DataBase.GetAllProjects().Where(u => !u.IsCompletion);
 
             //List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
             List<List<InlineKeyboardButton>> buttons = new List<List<InlineKeyboardButton>>();
@@ -172,21 +180,6 @@ namespace TelegramBotCrypto.Services
                 InlineKeyboardButton.WithCallbackData($"Мне нужна помощь", "need_help")
             };
             buttons.Add(helpBtn);
-
-            //var rkm = new ReplyKeyboardMarkup
-            //{
-            //    Keyboard =
-            //        new KeyboardButton[][]
-            //        {
-            //            new KeyboardButton[]
-            //            {
-            //                new KeyboardButton("item1"),
-            //                new KeyboardButton("item2")
-            //            }
-            //        }
-            //};
-
-            //await TelegramBot.SendTextMessageAsync(msg.Chat.Id, "Text", replyMarkup: rkm);
 
             var ikm = new InlineKeyboardMarkup(buttons);
 

@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using System.Windows.Media;
 using TelegramBotCrypto.Data;
 
 namespace TelegramBotCrypto.Models
@@ -16,6 +17,7 @@ namespace TelegramBotCrypto.Models
         /// </summary>
         public string Message { get; set; }
         public int CryptoTypeId { get; set; }
+        public bool IsCompletion { get; set; }
         public CryptoType CryptoType
         {
             get
@@ -28,6 +30,15 @@ namespace TelegramBotCrypto.Models
                 {
                     return new CryptoType();
                 }
+            }
+        }
+
+        [Ignore]
+        public SolidColorBrush Color
+        {
+            get 
+            {
+                return IsCompletion ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.Green);
             }
         }
     }

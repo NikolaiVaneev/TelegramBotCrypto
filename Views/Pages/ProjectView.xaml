@@ -28,7 +28,10 @@
                     <DataTemplate>
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Path=Title}" />
+                                <TextBlock Text="{Binding Path=Title}" 
+                                           Foreground="{Binding Path=Color}"
+                                           
+                                           />
                                 <TextBlock Margin="5 0" Text="-"/>
                                 <TextBlock Text="{Binding Path=CryptoType.Title}" />
                             </StackPanel>

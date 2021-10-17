@@ -19,7 +19,13 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         TextWrapping="Wrap" Height="150" VerticalScrollBarVisibility="Auto"
                         materialDesign:HintAssist.Hint = "Инструкция"/>
-        
+        <CheckBox x:Name="IsCompletion" Style="{StaticResource MaterialDesignAccentCheckBox}" 
+                  Content="Завершен" 
+                  HorizontalAlignment="Center" Background="#FF1D486E"
+                  Margin="0 10 0 5"
+                  />
+
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Style="{StaticResource MaterialDesignFlatButton}" Content="СОХРАНИТЬ"
                     IsEnabled="{Binding ElementName=ProjectTitle, Path=Text.Length}"

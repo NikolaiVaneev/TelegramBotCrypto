@@ -30,8 +30,7 @@ namespace TelegramBotCrypto.Views.Dialogs
                 BtnDel.Visibility = System.Windows.Visibility.Visible;
                 ProjectTitle.Text = project.Title;
                 ProjectMessage.Text = project.Message;
-
-
+                IsCompletion.IsChecked = project.IsCompletion;
                 CryptoTypes.SelectedValue = project.CryptoType.Title;
                 //CryptoTypes.SelectedItem = project.CryptoType;
             }
@@ -46,6 +45,7 @@ namespace TelegramBotCrypto.Views.Dialogs
         {
             Project.Title = ProjectTitle.Text;
             Project.Message = ProjectMessage.Text;
+            Project.IsCompletion = (bool)IsCompletion.IsChecked;
             CryptoType cryptoType = (CryptoType)CryptoTypes.SelectedItem;
             if (cryptoType != null)
             Project.CryptoTypeId = cryptoType.Id;
