@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using TelegramBotCrypto.Data;
+using TelegramBotCrypto.Infrastructure.Commands;
 using TelegramBotCrypto.Models;
 using TelegramBotCrypto.Services;
 
@@ -39,9 +41,20 @@ namespace TelegramBotCrypto.ViewModels.Pages
         }
         #endregion
 
+        #region Вывести пользователей в эксель
+        public ICommand UserListToExcelCommand { get; }
+        private bool CanUserListToExcelCommandExcecut(object p) => true;
+        private void OnUserListToExcelCommandExecuted(object p)
+        {
+            ExcelWorker.ShowProjectUsers();
+        }
+        #endregion
+
         public UsersViewModel()
         {
             InitUserListAcync();
+            UserListToExcelCommand = new RelayCommand(OnUserListToExcelCommandExecuted, CanUserListToExcelCommandExcecut);
+    
         }
         private async void InitUserListAcync()
         {
