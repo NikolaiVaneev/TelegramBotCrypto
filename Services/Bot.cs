@@ -71,6 +71,17 @@ namespace TelegramBotCrypto.Services
                 }
                 return;
             }
+            // Если запрос бонусов 
+            if (e.CallbackQuery.Data == "get_bonus_stat")
+            {
+                int balance = DataBase.GetReferCount(user);
+                SendMessageAsync(user, $"Ваш баланс бонусов - {balance} единиц");
+                //await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Ваш баланс - {balance}");
+                string message = $"Чтобы пригласить друга, отправьте ему ссылку https://t.me/{Info.Username}?start={user.User_Id}";
+                SendMessageAsync(user, message);
+                //await TelegramBot.SendTextMessageAsync(msg.Chat.Id, message);
+                return;
+            }
 
             // Если кликнули на проект
             Project Project = DataBase.GetAllProjects().FirstOrDefault(u => u.Id.ToString() == e.CallbackQuery.Data);
@@ -146,7 +157,26 @@ namespace TelegramBotCrypto.Services
                 }
             }
 
-            // Возврат к списку проектов
+            // Если кликнули на "Мои реквизиты"
+            if (e.CallbackQuery.Data == "get_payment_delails")
+            {
+                string paymentDetails = DataBase.GetPaymentDetails(user);
+                if (string.IsNullOrWhiteSpace(paymentDetails))
+                {
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"У Вас не заданы реквизиты");
+                }
+                else
+                {
+                    await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Ваши реквизиты - {paymentDetails}");
+                }
+                
+                await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Для привязки Ваших платежных данных напишите мне сообщение в формате  \"/pd Номер_карты(счета) Платежная_система(банк)\" " +
+                    $"{Environment.NewLine}Например: \"/pd 4201234567890000 Сбербанк\"");
+                return;
+            }
+
+
+            // Возврат к базовому списку
             if (e.CallbackQuery.Data == "comeback")
             {
                 SendProjectList(user, msg);
@@ -173,13 +203,26 @@ namespace TelegramBotCrypto.Services
                 //var btn = InlineKeyboardButton.WithCallbackData(type.Title, type.Title);
                 //buttons.Add(btn);
             }
-
+            // Реферальная программа
+            var paymentBtn = new List<InlineKeyboardButton>
+            {
+                InlineKeyboardButton.WithCallbackData($"💵 Мои реквизиты 💵", "get_payment_delails")
+            };
+            buttons.Add(paymentBtn);
+            // Реферальная программа
+            var referBtn = new List<InlineKeyboardButton>
+            {
+                InlineKeyboardButton.WithCallbackData($"🏆 Мои бонусы 🏆", "get_bonus_stat")
+            };
+            buttons.Add(referBtn);
             // Кнопка помощи
             var helpBtn = new List<InlineKeyboardButton>
             {
-                InlineKeyboardButton.WithCallbackData($"Мне нужна помощь", "need_help")
+                InlineKeyboardButton.WithCallbackData($"❓ Мне нужна помощь ❓", "need_help")
             };
             buttons.Add(helpBtn);
+
+
 
             var ikm = new InlineKeyboardMarkup(buttons);
 
@@ -199,6 +242,8 @@ namespace TelegramBotCrypto.Services
         private static void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             Telegram.Bot.Types.Message msg = e.Message;
+            string messageText = msg.Text;
+
             User user = new User
             {
                 User_Id = msg.Chat.Id,
@@ -206,7 +251,33 @@ namespace TelegramBotCrypto.Services
                 User_FirstName = msg.Chat.FirstName,
                 User_LastName = msg.Chat.LastName
             };
+            // Добавляем реферала
+
+            if (messageText.Contains("start") && messageText.Length > 10)
+            {
+                string referId = messageText.Substring(messageText.IndexOf(" ") + 1);
+                user.ReferId = int.Parse(referId);
+            }
             DataBase.SaveUser(user);
+
+            if (messageText.Contains("/pd"))
+            {
+                if (messageText.Length < 10)
+                {
+                    SendMessageAsync(user, "Введены некорректные платежные реквизиты");
+ 
+                }
+                else
+                {
+                    // TODO: Алгоритм привязки платежных реквизитов
+                    string pd = messageText.Substring(3);
+                    user.PaymentDetail = pd.Trim();
+                    DataBase.UpdatePaymentDetail(user);
+                    SendMessageAsync(user, $"Вы установили следующие реквизиты - {pd}");
+                }
+                return;
+            }
+
 
             if (msg.Photo != null || msg.Document != null)
             {
@@ -219,6 +290,9 @@ namespace TelegramBotCrypto.Services
             SendProjectList(user, msg);
 
         }
+        
+        
+        
         public async static void SendPhotoMessageAllAdmin(Telegram.Bot.Types.Message msg)
         {
             List<User> admins = DataBase.GetAdminAll();
@@ -383,7 +457,6 @@ namespace TelegramBotCrypto.Services
                 //SendMessagesAllAsync($"{cryptoType.Title}{Environment.NewLine}{message}", 1);
             });
             Logger.Add($"Всего сообщений - {FromUser.Count}, доставлено - {SendedMessage.Count}, не доставлено - {NotSendedMessage.Count}");
-            //TODO : Вывод в эксель
             ExcelWorker.ShowSendingReport(SendedMessage, NotSendedMessage);
   
     

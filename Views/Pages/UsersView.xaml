@@ -29,6 +29,7 @@
                 <DataGridTextColumn Header="Имя" IsReadOnly="True" Binding="{Binding Path=User_FirstName}"/>
                 <DataGridTextColumn Header="Фамилия" IsReadOnly="True" Binding="{Binding Path=User_LastName}"/>
                 <DataGridTextColumn Header="Телефон" IsReadOnly="True" Binding="{Binding Path=User_Phone}"/>
+                <DataGridTextColumn Header="Реквизиты" IsReadOnly="True" Binding="{Binding Path=PaymentDetail}"/>
                 <DataGridCheckBoxColumn
 
                     Binding="{Binding User_Status, UpdateSourceTrigger=PropertyChanged}"

@@ -28,6 +28,9 @@ namespace TelegramBotCrypto.Models
             set => SetProperty(ref _userStatus, value);
         }
 
+        public long ReferId { get; set; }
+        public string PaymentDetail { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

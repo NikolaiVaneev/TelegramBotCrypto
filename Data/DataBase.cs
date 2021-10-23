@@ -70,12 +70,8 @@ namespace TelegramBotCrypto.Data
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
             {
                 connection.Delete(project);
-
-                //TODO : Удалять кроме проекта его участников
-                //connection.Execute($"DELETE FROM Crypto WHERE CryptoID = {project.Id}");
             };
         }
-
         internal static List<Participation> GetParticipationList(string finder = "")
         {
             using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
@@ -91,6 +87,19 @@ namespace TelegramBotCrypto.Data
                     
 
                 return list;
+            };
+        }
+        /// <summary>
+        /// Получить количество рефералов
+        /// </summary>
+        /// <returns></returns>
+        internal static int GetReferCount(User user)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+
+                return connection.Query<User>($"SELECT * FROM User WHERE ReferId = {user.User_Id}").Count;
+                
             };
         }
 
@@ -200,6 +209,14 @@ namespace TelegramBotCrypto.Data
             };
         }
 
+        internal static string GetPaymentDetails(User user)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                return connection.Query<User>($"SELECT * FROM User WHERE User_Id = {user.User_Id}").FirstOrDefault().PaymentDetail;
+            };
+        }
+
         /// <summary>
         /// Учавствует-ли пользователь в проекте?
         /// </summary>
@@ -284,9 +301,25 @@ namespace TelegramBotCrypto.Data
                     connection.Query<User>($"UPDATE User SET User_nickname = '{user.User_Nickname}' WHERE User_id = {user.User_Id}");
                     Logger.Add($"Ник пользователя {findedUser[0].User_Nickname} изменен на {user.User_Nickname}");
                 }
+                
+            };
+        }
+
+        internal static void UpdatePaymentDetail(User user)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
+            {
+                {
+                    string query = "UPDATE User SET PaymentDetail = ? WHERE User_id = ?;";
+                    connection.Query<User>(query, new string[] { user.PaymentDetail, user.User_Id.ToString() });
+
+                    
+                    Logger.Add($"Пользователь {user.User_Nickname} обновил платежные реквизиты");
+                }
 
             };
         }
+
 
         #endregion
 
