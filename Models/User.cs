@@ -31,8 +31,8 @@ namespace TelegramBotCrypto.Models
             set => SetProperty(ref _userStatus, value);
         }
 
-        private bool _adminMessage;
-        public bool AdminMessage
+        private byte _adminMessage;
+        public byte AdminMessage
         {
             get => _adminMessage;
             set => SetProperty(ref _adminMessage, value);
