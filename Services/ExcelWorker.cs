@@ -12,6 +12,28 @@ namespace TelegramBotCrypto.Services
 {
     public static class ExcelWorker
     {
+        private static Workbook xlWorkBook;
+        private static Worksheet xlWorkSheet;
+        private static Microsoft.Office.Interop.Excel.Application xlApp;
+        private static bool ExcelAppInit()
+        {
+            try
+            {
+                xlApp = new Microsoft.Office.Interop.Excel.Application();
+                if (xlApp == null)
+                    return false;
+
+                object misValue = System.Reflection.Missing.Value;
+
+                xlWorkBook = xlApp.Workbooks.Add(misValue);
+                xlWorkSheet = (Worksheet)xlWorkBook.Worksheets.get_Item(1);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
         public static List<Wallet> GetData(string filePath, int cryptoTypeId)
         {
             List<Wallet> cryptoList = new List<Wallet>();
@@ -40,14 +62,11 @@ namespace TelegramBotCrypto.Services
             }
             return cryptoList;
         }
-
         public static void ShowAllProjectUsers(string projectName)
         {
-            Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
 
-            if (xlApp == null)
+            if (!ExcelAppInit())
             {
-                MessageBox.Show("Excel не установлен!");
                 return;
             }
 
@@ -57,24 +76,15 @@ namespace TelegramBotCrypto.Services
 
             List<Participation> participations = DataBase.GetParticipationProject(project.Id);
 
-            Workbook xlWorkBook;
-            Worksheet xlWorkSheet;
-            object misValue = System.Reflection.Missing.Value;
-
-            xlWorkBook = xlApp.Workbooks.Add(misValue);
-            xlWorkSheet = (Worksheet)xlWorkBook.Worksheets.get_Item(1);
-
             xlWorkSheet.Columns["A:A"].ColumnWidth = 12;
             xlWorkSheet.Columns["B:B"].ColumnWidth = 14;
             xlWorkSheet.Columns["C:C"].ColumnWidth = 10;
             xlWorkSheet.Columns["D:D"].ColumnWidth = 45;
 
-
             xlWorkSheet.Cells[1, 1] = "ID";
             xlWorkSheet.Cells[1, 2] = "Ник";
             xlWorkSheet.Cells[1, 3] = "Тип";
             xlWorkSheet.Cells[1, 4] = "Кошелек";
-
 
             for (int i = 0; i < participations.Count(); i++)
             {
@@ -85,23 +95,12 @@ namespace TelegramBotCrypto.Services
             }
             xlApp.Visible = true;
         }
-
         internal static void ShowProjectUsers()
         {
-            Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-
-            if (xlApp == null)
+            if (!ExcelAppInit())
             {
-                MessageBox.Show("Excel не установлен!");
                 return;
             }
-
-            Workbook xlWorkBook;
-            Worksheet xlWorkSheet;
-            object misValue = System.Reflection.Missing.Value;
-
-            xlWorkBook = xlApp.Workbooks.Add(misValue);
-            xlWorkSheet = (Worksheet)xlWorkBook.Worksheets.get_Item(1);
 
             xlWorkSheet.Columns["A:A"].ColumnWidth = 11;
             xlWorkSheet.Columns["B:B"].ColumnWidth = 22;
@@ -130,7 +129,7 @@ namespace TelegramBotCrypto.Services
                 xlWorkSheet.Cells[i + 2, 4] = users[i].User_LastName;
                 xlWorkSheet.Cells[i + 2, 5] = users[i].User_Phone;
                 xlWorkSheet.Cells[i + 2, 6] = users[i].PaymentDetail;
-                
+
                 if (users[i].ReferId != 0)
                 {
                     xlWorkSheet.Cells[i + 2, 7] = users[i].ReferId;
@@ -145,23 +144,12 @@ namespace TelegramBotCrypto.Services
 
             xlApp.Visible = true;
         }
-
         internal static void ShowSendingReport(List<User> sendedMessage, List<User> notSendedMessage)
         {
-            Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-
-            if (xlApp == null)
+            if (!ExcelAppInit())
             {
-                MessageBox.Show("Excel не установлен!");
                 return;
             }
-
-            Workbook xlWorkBook;
-            Worksheet xlWorkSheet;
-            object misValue = System.Reflection.Missing.Value;
-
-            xlWorkBook = xlApp.Workbooks.Add(misValue);
-            xlWorkSheet = (Worksheet)xlWorkBook.Worksheets.get_Item(1);
 
             xlWorkSheet.Columns["A:A"].ColumnWidth = 20;
             xlWorkSheet.Columns["B:B"].ColumnWidth = 20;
