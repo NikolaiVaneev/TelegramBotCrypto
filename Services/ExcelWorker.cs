@@ -110,7 +110,7 @@ namespace TelegramBotCrypto.Services
             xlWorkSheet.Columns["E:E"].ColumnWidth = 17;
             xlWorkSheet.Columns["F:F"].ColumnWidth = 25;
             xlWorkSheet.Columns["G:G"].ColumnWidth = 11;
-            xlWorkSheet.Columns["I:I"].ColumnWidth = 5;
+            xlWorkSheet.Columns["H:H"].ColumnWidth = 5;
 
             xlWorkSheet.Cells[1, 1] = "ID";
             xlWorkSheet.Cells[1, 2] = "Ник";
@@ -121,7 +121,7 @@ namespace TelegramBotCrypto.Services
             xlWorkSheet.Cells[1, 7] = "Пригласил";
             xlWorkSheet.Cells[1, 8] = "Администратор";
 
-            var users = DataBase.GetUserList();
+            List<User> users = DataBase.GetUserList();
             for (int i = 0; i < users.Count(); i++)
             {
                 xlWorkSheet.Cells[i + 2, 1] = users[i].User_Id;

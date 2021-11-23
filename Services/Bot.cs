@@ -171,7 +171,11 @@ namespace TelegramBotCrypto.Services
                 }
                 
                 await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Для привязки Ваших платежных данных напишите мне сообщение в формате  \"/pd Номер_карты(счета) Платежная_система(банк)\" " +
-                    $"{Environment.NewLine}Например: \"/pd 4201234567890000 Сбербанк\"");
+                    $"{Environment.NewLine}Например: {Environment.NewLine}/pd 4201234567890000 Сбербанк" +
+                    $"{Environment.NewLine}❗️Мы работаем со следующими платежными системами: Сбербанк, Тинькофф, Qiwi, ЮMoney, Webmoney");
+
+
+
                 return;
             }
 
@@ -214,7 +218,8 @@ namespace TelegramBotCrypto.Services
             {
                 InlineKeyboardButton.WithCallbackData($"🏆 Мои бонусы 🏆", "get_bonus_stat")
             };
-            buttons.Add(referBtn);
+            // UNDONE : Пока рефералы отключены
+        //    buttons.Add(referBtn);
             // Кнопка помощи
             var helpBtn = new List<InlineKeyboardButton>
             {
@@ -251,8 +256,14 @@ namespace TelegramBotCrypto.Services
                 User_FirstName = msg.Chat.FirstName,
                 User_LastName = msg.Chat.LastName
             };
+            if (msg.Photo != null || msg.Document != null)
+            {
+                // TODO: Отправить фото админам (и сохранить может быть?)
+                SendPhotoMessageAllAdmin(msg);
+                return;
+            }
             // Добавляем реферала
-
+            if (messageText == null) return;
             if (messageText.Contains("start") && messageText.Length > 10)
             {
                 string referId = messageText.Substring(messageText.IndexOf(" ") + 1);
@@ -279,20 +290,12 @@ namespace TelegramBotCrypto.Services
             }
 
 
-            if (msg.Photo != null || msg.Document != null)
-            {
-                // TODO: Отправить фото админам (и сохранить может быть?)
-                SendPhotoMessageAllAdmin(msg);
-                return;
-            }
+
 
             if (msg.Text == null) return;
             SendProjectList(user, msg);
 
         }
-        
-        
-        
         public async static void SendPhotoMessageAllAdmin(Telegram.Bot.Types.Message msg)
         {
             List<User> admins = DataBase.GetAdminAll();
@@ -304,8 +307,14 @@ namespace TelegramBotCrypto.Services
                 {
                     if (msg.Photo != null)
                     {
+                        try { 
                         await TelegramBot.SendPhotoAsync(admin.User_Id, msg.Photo[0].FileId, message);
                         Logger.Add($"Пользователь {msg.Chat.Username} отправил изображение");
+                        }
+                        catch
+                        {
+
+                        }
                     }
 
                     if (msg.Document != null)
@@ -353,15 +362,8 @@ namespace TelegramBotCrypto.Services
 
                 foreach (var user in users)
                 {
-                    try
-                    {
-                        TelegramBot.SendTextMessageAsync(user.User_Id, message);
-                        Logger.Add($"Сообщение пользователю {user.User_Nickname} ({user.User_Id}) отправлено");
-                    }
-                    catch
-                    {
-                        Logger.Add($"Сообщение для {user.User_Nickname} ({user.User_Id}) НЕ отправлено");
-                    }
+                    SendMessageAsync(user, message);
+
                 }
             });
 
