@@ -1,11 +1,8 @@
 ﻿using SQLite;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using TelegramBotCrypto.Data;
-using TelegramBotCrypto.Infrastructure.Commands;
 
 
 namespace TelegramBotCrypto.Models

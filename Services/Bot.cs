@@ -169,7 +169,7 @@ namespace TelegramBotCrypto.Services
                 {
                     await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Ваши реквизиты - {paymentDetails}");
                 }
-                
+
                 await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Для привязки Ваших платежных данных напишите мне сообщение в формате  \"/pd Номер_карты(счета) Платежная_система(банк)\" " +
                     $"{Environment.NewLine}Например: {Environment.NewLine}/pd 4201234567890000 Сбербанк" +
                     $"{Environment.NewLine}❗️Мы работаем со следующими платежными системами: Сбербанк, Тинькофф, Qiwi, ЮMoney, Webmoney");
@@ -219,7 +219,7 @@ namespace TelegramBotCrypto.Services
                 InlineKeyboardButton.WithCallbackData($"🏆 Мои бонусы 🏆", "get_bonus_stat")
             };
             // UNDONE : Пока рефералы отключены
-        //    buttons.Add(referBtn);
+            //    buttons.Add(referBtn);
             // Кнопка помощи
             var helpBtn = new List<InlineKeyboardButton>
             {
@@ -243,40 +243,67 @@ namespace TelegramBotCrypto.Services
             }
         }
 
+        /// <summary>
+        /// Проверка пользователя (Добавление нового)
+        /// </summary>
+        /// <param name="msg">Сообщение в ТГ</param>
+        /// <returns></returns>
+        private static User CheckUserExist(ref Telegram.Bot.Types.Message msg)
+        {
+            string messageText = msg.Text;
+
+            User user = DataBase.GetUser(msg.Chat.Id);
+            if (user == null)
+            {
+                user = new User
+                {
+                    User_Id = msg.Chat.Id,
+                    User_Nickname = msg.Chat.Username,
+                    User_FirstName = msg.Chat.FirstName,
+                    User_LastName = msg.Chat.LastName
+                };
+            }
+
+            // Добавляем реферала
+            if (messageText != null && messageText.Contains("start") && messageText.Length > 10)
+            {
+                string referId = messageText.Substring(messageText.IndexOf(" ") + 1);
+                user.ReferId = int.Parse(referId);
+            }
+
+            DataBase.SaveUser(user);
+            return user;
+        }
         [Obsolete]
         private static void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             Telegram.Bot.Types.Message msg = e.Message;
             string messageText = msg.Text;
 
-            User user = new User
-            {
-                User_Id = msg.Chat.Id,
-                User_Nickname = msg.Chat.Username,
-                User_FirstName = msg.Chat.FirstName,
-                User_LastName = msg.Chat.LastName
-            };
+            User user = CheckUserExist(ref msg);
+
             if (msg.Photo != null || msg.Document != null)
             {
-                // TODO: Отправить фото админам (и сохранить может быть?)
-                SendPhotoMessageAllAdmin(msg);
+                // Если скидывает админ и у него есть доступ
+                if (user.User_Status == 1 && user.AdminMessage == 1)
+                {
+                    SendPhotoMessageAllUser(msg);
+                }
+
+                // Отправить фото админам
+                if (user.User_Status == 0)
+                    SendPhotoMessageAllAdmin(msg);
                 return;
             }
-            // Добавляем реферала
+
             if (messageText == null) return;
-            if (messageText.Contains("start") && messageText.Length > 10)
-            {
-                string referId = messageText.Substring(messageText.IndexOf(" ") + 1);
-                user.ReferId = int.Parse(referId);
-            }
-            DataBase.SaveUser(user);
 
             if (messageText.Contains("/pd"))
             {
                 if (messageText.Length < 10)
                 {
                     SendMessageAsync(user, "Введены некорректные платежные реквизиты");
- 
+
                 }
                 else
                 {
@@ -289,10 +316,7 @@ namespace TelegramBotCrypto.Services
                 return;
             }
 
-
-
-
-            if (msg.Text == null) return;
+            // Отобразить список проектов
             SendProjectList(user, msg);
 
         }
@@ -307,9 +331,10 @@ namespace TelegramBotCrypto.Services
                 {
                     if (msg.Photo != null)
                     {
-                        try { 
-                        await TelegramBot.SendPhotoAsync(admin.User_Id, msg.Photo[0].FileId, message);
-                        Logger.Add($"Пользователь {msg.Chat.Username} отправил изображение");
+                        try
+                        {
+                            await TelegramBot.SendPhotoAsync(admin.User_Id, msg.Photo[0].FileId, message);
+                            Logger.Add($"Пользователь {msg.Chat.Username} отправил изображение");
                         }
                         catch
                         {
@@ -329,6 +354,31 @@ namespace TelegramBotCrypto.Services
                 }
             }
 
+        }
+
+        public async static void SendPhotoMessageAllUser(Telegram.Bot.Types.Message msg)
+        {
+            string message = msg.Caption;
+            string sendCommand = "msg";
+
+            if (string.IsNullOrWhiteSpace(message) || !message.Contains($"/{sendCommand}"))
+            {
+                await TelegramBot.SendTextMessageAsync(msg.Chat.Id, $"Не верный формат отправки. Добавьте в подпись к изорабжению /{sendCommand}. Например, /msg Сообщение");
+                return;
+            }
+
+
+
+            List<User> users = DataBase.GetUserList();
+            message = message.Substring(sendCommand.Length + 2);
+            foreach (User user in users)
+            {
+                try
+                {
+                    await TelegramBot.SendPhotoAsync(user.User_Id, msg.Photo[0].FileId, message);
+                }
+                catch { }
+            }
         }
 
         /// <summary>
@@ -437,10 +487,10 @@ namespace TelegramBotCrypto.Services
                 foreach (var user in FromUser)
                 {
                     Task<Telegram.Bot.Types.Message> sentMessage = default;
-               
 
-                        sentMessage = TelegramBot.SendTextMessageAsync(user.User_Id, message);
-                  
+
+                    sentMessage = TelegramBot.SendTextMessageAsync(user.User_Id, message);
+
 
                     try
                     {
@@ -460,8 +510,8 @@ namespace TelegramBotCrypto.Services
             });
             Logger.Add($"Всего сообщений - {FromUser.Count}, доставлено - {SendedMessage.Count}, не доставлено - {NotSendedMessage.Count}");
             ExcelWorker.ShowSendingReport(SendedMessage, NotSendedMessage);
-  
-    
+
+
 
         }
         public async static void SendMessageAsync(User user, string message)
