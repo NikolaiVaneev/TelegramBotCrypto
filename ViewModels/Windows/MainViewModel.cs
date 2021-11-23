@@ -104,6 +104,14 @@ namespace TelegramBotCrypto.ViewModels
             Content = new ParticipationView();
         }
         #endregion
+        #region Открыть участников
+        public ICommand OpenAdminsListCommand { get; }
+        private bool CanOpenAdminsListCommandExcecut(object p) => true;
+        private void OnOpenAdminsListCommandExecuted(object p)
+        {
+            Content = new AdminsView();
+        }
+        #endregion
         #region Открыть логи
         public ICommand OpenLogPageCommand { get; }
         private bool CanOpenLogPageCommandExcecut(object p) => true;
@@ -128,6 +136,7 @@ namespace TelegramBotCrypto.ViewModels
 
             CloseApplicationCommand = new RelayCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExcecut);
             OpenUsersListCommand = new RelayCommand(OnOpenUsersListCommandExecuted, CanOpenUsersListCommandExcecut);
+            OpenAdminsListCommand = new RelayCommand(OnOpenAdminsListCommandExecuted, CanOpenAdminsListCommandExcecut);
             OpenSettingsCommand = new RelayCommand(OnOpenSettingsCommandExecuted, CanOpenSettingsCommandExcecut);
             OpenCryptoTypeListCommand = new RelayCommand(OnOpenCryptoTypeListCommandExecuted, CanOpenCryptoTypeListCommandExcecut);
             OpenCryptoListCommand = new RelayCommand(OnOpenCryptoListCommandExecuted, CanOpenCryptoListCommandExcecut);

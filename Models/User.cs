@@ -22,10 +22,20 @@ namespace TelegramBotCrypto.Models
         public string User_LastName { get; set; }
         public string User_Nickname { get; set; }
         public string User_Phone { get; set; }
+        /// <summary>
+        /// 1 - админ, 0 - пользователь
+        /// </summary>
         public byte User_Status
         {
             get => _userStatus;
             set => SetProperty(ref _userStatus, value);
+        }
+
+        private bool _adminMessage;
+        public bool AdminMessage
+        {
+            get => _adminMessage;
+            set => SetProperty(ref _adminMessage, value);
         }
 
         public long ReferId { get; set; }

@@ -82,9 +82,9 @@ namespace TelegramBotCrypto.Data
                 else
                 {
                     string query = "SELECT * FROM Participation JOIN User u ON u.User_id = Participation.UserId WHERE User_Nickname LIKE ? OR UserId LIKE ?;";
-                        list = connection.Query<Participation>(query, new string[] { "%" + finder + "%", "%" + finder + "%" });
+                    list = connection.Query<Participation>(query, new string[] { "%" + finder + "%", "%" + finder + "%" });
                 }
-                    
+
 
                 return list;
             };
@@ -99,7 +99,7 @@ namespace TelegramBotCrypto.Data
             {
 
                 return connection.Query<User>($"SELECT * FROM User WHERE ReferId = {user.User_Id}").Count;
-                
+
             };
         }
 
@@ -125,6 +125,14 @@ namespace TelegramBotCrypto.Data
                 using (SQLiteConnection connection = new SQLiteConnection(DataBasePath))
                 {
                     connection.Query<User>($"UPDATE User SET User_Status = '{user.User_Status}' WHERE User_id = {user.User_Id}");
+                    if (user.User_Status == 0)
+                    {
+                        connection.Query<User>($"UPDATE User SET AdminMessage = 0 WHERE User_id = {user.User_Id}");
+                    }
+                    else
+                    {
+                        connection.Query<User>($"UPDATE User SET AdminMessage = '{user.AdminMessage}' WHERE User_id = {user.User_Id}");
+                    }
                 };
             });
         }
@@ -301,7 +309,7 @@ namespace TelegramBotCrypto.Data
                     connection.Query<User>($"UPDATE User SET User_nickname = '{user.User_Nickname}' WHERE User_id = {user.User_Id}");
                     Logger.Add($"Ник пользователя {findedUser[0].User_Nickname} изменен на {user.User_Nickname}");
                 }
-                
+
             };
         }
 
@@ -313,7 +321,7 @@ namespace TelegramBotCrypto.Data
                     string query = "UPDATE User SET PaymentDetail = ? WHERE User_id = ?;";
                     connection.Query<User>(query, new string[] { user.PaymentDetail, user.User_Id.ToString() });
 
-                    
+
                     Logger.Add($"Пользователь {user.User_Nickname} обновил платежные реквизиты");
                 }
 

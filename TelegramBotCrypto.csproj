@@ -118,6 +118,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Pages\AdminsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Pages\CryptoView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -177,6 +181,7 @@
     <Compile Include="SQLite.cs" />
     <Compile Include="SQLiteAsync.cs" />
     <Compile Include="ViewModels\Base\ViewModel.cs" />
+    <Compile Include="ViewModels\Pages\AdminsViewModel.cs" />
     <Compile Include="ViewModels\Pages\CryptoTypeViewModel.cs" />
     <Compile Include="ViewModels\Pages\CryptoViewModel.cs" />
     <Compile Include="ViewModels\Pages\LogViewModel.cs" />
@@ -194,6 +199,9 @@
     </Compile>
     <Compile Include="Views\Dialogs\ProjectDialog.xaml.cs">
       <DependentUpon>ProjectDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\AdminsView.xaml.cs">
+      <DependentUpon>AdminsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\CryptoView.xaml.cs">
       <DependentUpon>CryptoView.xaml</DependentUpon>
